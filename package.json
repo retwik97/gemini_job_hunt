@@ -1,0 +1,15 @@
+{
+  "name": "job-application-bot",
+  "version": "1.0.0",
+  "description": "Daily job search + AI resume tailoring + apply-review pipeline",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "docx": "^9.0.2"
+  }
+}

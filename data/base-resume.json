@@ -1,0 +1,29 @@
+{
+  "name": "Retwik Satya Teja",
+  "contactLine": "Systems Engineer / .NET Developer | linkedin.com/in/retwik-satya-teja-9040ab147 | Hyderabad, India",
+  "summary": "Systems Engineer / .NET Developer with 4 years of experience operating Microsoft 365-scale Azure infrastructure. Skilled in Azure VMSS, Azure DevOps CI/CD, AKS/Docker, Bicep/ARM IaC, KQL-based observability, and .NET Framework development. AZ-400, AZ-204, AZ-900 certified.",
+  "skills": [
+    "Azure VMSS",
+    "Azure DevOps (CI/CD Pipelines)",
+    "AKS",
+    "Docker",
+    "Bicep",
+    "ARM Templates",
+    "KQL / Log Analytics",
+    ".NET Framework",
+    "C#",
+    "PowerShell",
+    "Python",
+    "Bash",
+    "Azure Front Door",
+    "Azure SQL / Entra ID Authentication",
+    "Site Reliability Engineering"
+  ],
+  "experienceHighlights": [
+    "Diagnosed a production incident on a 75-instance Azure VMSS where Azure Front Door was reusing persistent connections to only 4 instances, causing IIS saturation and 503 errors despite healthy probe status; used KQL/Log Analytics to isolate root cause and drove post-incident action items including per-instance alerting.",
+    "Resolved persistent NuGet/MSBuild build failures in a .NET Framework 4.7.2 solution caused by TFM incompatibilities, incorrect Azure DevOps pipeline tooling, and stale HintPaths, restoring reliable CI builds.",
+    "Configured Azure SQL Server Entra ID-only authentication across Portal, CLI, PowerShell, and Bicep for improved security posture.",
+    "Operate and support Microsoft 365-scale Azure infrastructure spanning VMSS, AKS/Docker, and Azure DevOps CI/CD pipelines.",
+    "Certified in AZ-400 (DevOps Engineer Expert), AZ-204 (Developer Associate), and AZ-900 (Azure Fundamentals)."
+  ]
+}
