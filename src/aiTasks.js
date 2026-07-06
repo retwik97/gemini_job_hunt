@@ -5,7 +5,13 @@ import { callLLM } from "./llm/index.js";
 
 function extractJson(text) {
   // Strip markdown fences if the model added them despite instructions
-  const cleaned = text.replace(/```json|```/g, "").trim();
+  let cleaned = text.replace(/```json|```/g, "").trim();
+  // If there's stray text before/after the JSON object, grab just the {...} span
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start !== -1 && end !== -1 && end > start) {
+    cleaned = cleaned.slice(start, end + 1);
+  }
   return JSON.parse(cleaned);
 }
 
