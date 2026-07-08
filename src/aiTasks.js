@@ -14,7 +14,6 @@ import { callLLM } from "./llm/index.js";
 
 function extractJson(text) {
   let cleaned = text.replace(/```json|```/g, "").trim();
-  // For arrays, grab the [...] span; for objects, grab the {...} span.
   const arrStart = cleaned.indexOf("[");
   const objStart = cleaned.indexOf("{");
   if (arrStart !== -1 && (objStart === -1 || arrStart < objStart)) {
@@ -25,6 +24,29 @@ function extractJson(text) {
     if (end > objStart) cleaned = cleaned.slice(objStart, end + 1);
   }
   return JSON.parse(cleaned);
+}
+
+// Salvages whatever complete entries it can from a JSON array that got cut
+// off mid-generation, instead of discarding the entire batch on one error.
+function parsePartialJsonArray(text) {
+  let cleaned = text.replace(/```json|```/g, "").trim();
+  const start = cleaned.indexOf("[");
+  if (start === -1) return [];
+  cleaned = cleaned.slice(start);
+
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    // Truncate to the last fully-closed object and close the array there.
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (lastBrace === -1) return [];
+    const candidate = cleaned.slice(0, lastBrace + 1) + "]";
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      return [];
+    }
+  }
 }
 
 function flattenSkills(baseResume) {
@@ -44,18 +66,20 @@ function flattenBullets(baseResume) {
   return bullets.join("\n");
 }
 
-// Truncate long JDs so a batch of ~50-60 jobs doesn't blow the token budget.
 function truncate(text, maxChars = 900) {
   if (!text) return "";
   return text.length > maxChars ? text.slice(0, maxChars) + "..." : text;
 }
 
 // Scores ALL jobs in a single API call. Returns a Map keyed by job.id.
+// If the response gets cut off, salvages whatever entries did complete
+// rather than failing the whole batch — missing jobs are simply skipped
+// this run and can be picked up as "still new" next run.
 export async function scoreJobsBatch(jobs, baseResume) {
   if (jobs.length === 0) return new Map();
 
-  const system = `You are an ATS-style recruiter screening assistant. You will be given a candidate profile and a list of jobs. Score EVERY job in the list from 0-100 based on fit. Respond with ONLY a valid JSON array, no preamble, no markdown fences, one entry per job in the exact order given:
-[{"id": "<job id, copied exactly>", "score": <0-100 integer>, "matchingSkills": [...], "missingSkills": [...], "reason": "<1 short sentence>"}, ...]`;
+  const system = `You are an ATS-style recruiter screening assistant. You will be given a candidate profile and a list of jobs. Score EVERY job in the list from 0-100 based on fit. Be CONCISE to keep output short: matchingSkills and missingSkills max 5 items each, reason max 10 words. Respond with ONLY a valid JSON array, no preamble, no markdown fences, one entry per job in the exact order given:
+[{"id": "<job id, copied exactly>", "score": <0-100 integer>, "matchingSkills": [...max 5], "missingSkills": [...max 5], "reason": "<max 10 words>"}, ...]`;
 
   const jobsList = jobs
     .map(
@@ -75,11 +99,18 @@ ${jobsList}
 
 Return a JSON array with exactly ${jobs.length} entries, one per job, in the same order, each with the job's exact "id".`;
 
-  // Generous token budget: ~60-90 tokens per job entry, scaled to batch size.
-  const maxTokens = Math.min(8192, 500 + jobs.length * 120);
+  // Generous per-job budget (concise fields above keep actual usage well under this).
+  const maxTokens = Math.min(16000, 800 + jobs.length * 250);
 
   const raw = await callLLM(system, userText, maxTokens);
-  const results = extractJson(raw);
+  let results;
+  try {
+    results = extractJson(raw);
+  } catch {
+    console.warn("  Batch response was malformed JSON, attempting to salvage partial results...");
+    results = parsePartialJsonArray(raw);
+    console.warn(`  Salvaged ${results.length} of ${jobs.length} job scores from this batch.`);
+  }
 
   const map = new Map();
   for (const r of results) {

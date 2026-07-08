@@ -13,7 +13,7 @@ const LOG_PATH = path.resolve("data/application-log.json");
 const RESUME_OUTPUT_DIR = path.resolve("data/generated-resumes");
 
 const SCORE_THRESHOLD = 70;
-const BATCH_SIZE = 40; // keeps each scoring call's token usage safely bounded
+const BATCH_SIZE = 15; // keeps each scoring call's token usage safely bounded
 
 function loadJson(filePath, fallback) {
   if (!fs.existsSync(filePath)) return fallback;
