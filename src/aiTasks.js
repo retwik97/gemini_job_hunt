@@ -1,6 +1,10 @@
 // Job scoring and resume tailoring — uses whichever provider is configured
 // in src/llm/index.js (currently controlled by the LLM_PROVIDER env var).
 //
+// Scoring is BATCHED — all jobs go in a single API call instead of one call
+// per job. This is the difference between ~55 requests/day and ~2-6, which
+// matters a lot given how aggressively free-tier quotas get cut.
+//
 // Tailoring never rewrites your actual bullet wording or invents skills —
 // it only: (1) writes a JD-tailored summary from facts you already provided,
 // (2) picks/orders a "key skills" line from skills you already have, and
@@ -10,10 +14,15 @@ import { callLLM } from "./llm/index.js";
 
 function extractJson(text) {
   let cleaned = text.replace(/```json|```/g, "").trim();
-  const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
-  if (start !== -1 && end !== -1 && end > start) {
-    cleaned = cleaned.slice(start, end + 1);
+  // For arrays, grab the [...] span; for objects, grab the {...} span.
+  const arrStart = cleaned.indexOf("[");
+  const objStart = cleaned.indexOf("{");
+  if (arrStart !== -1 && (objStart === -1 || arrStart < objStart)) {
+    const end = cleaned.lastIndexOf("]");
+    if (end > arrStart) cleaned = cleaned.slice(arrStart, end + 1);
+  } else if (objStart !== -1) {
+    const end = cleaned.lastIndexOf("}");
+    if (end > objStart) cleaned = cleaned.slice(objStart, end + 1);
   }
   return JSON.parse(cleaned);
 }
@@ -35,25 +44,48 @@ function flattenBullets(baseResume) {
   return bullets.join("\n");
 }
 
-export async function scoreJob(job, baseResume) {
-  const system = `You are an ATS-style recruiter screening assistant. Respond with ONLY valid JSON, no preamble, no markdown fences. Format:
-{"score": <0-100 integer>, "matchingSkills": [...], "missingSkills": [...], "reason": "<1-2 sentences>"}`;
+// Truncate long JDs so a batch of ~50-60 jobs doesn't blow the token budget.
+function truncate(text, maxChars = 900) {
+  if (!text) return "";
+  return text.length > maxChars ? text.slice(0, maxChars) + "..." : text;
+}
 
-  const userText = `CANDIDATE RESUME SUMMARY:
-${baseResume.summary}
+// Scores ALL jobs in a single API call. Returns a Map keyed by job.id.
+export async function scoreJobsBatch(jobs, baseResume) {
+  if (jobs.length === 0) return new Map();
+
+  const system = `You are an ATS-style recruiter screening assistant. You will be given a candidate profile and a list of jobs. Score EVERY job in the list from 0-100 based on fit. Respond with ONLY a valid JSON array, no preamble, no markdown fences, one entry per job in the exact order given:
+[{"id": "<job id, copied exactly>", "score": <0-100 integer>, "matchingSkills": [...], "missingSkills": [...], "reason": "<1 short sentence>"}, ...]`;
+
+  const jobsList = jobs
+    .map(
+      (j, i) =>
+        `--- JOB ${i + 1} ---\nid: ${j.id}\ntitle: ${j.title}\ncompany: ${j.company}\ndescription: ${truncate(j.description)}`
+    )
+    .join("\n\n");
+
+  const userText = `CANDIDATE PROFILE:
+Summary: ${baseResume.summary}
 Skills: ${flattenSkills(baseResume).join(", ")}
 Experience highlights:
 ${flattenBullets(baseResume)}
 
-JOB TITLE: ${job.title}
-COMPANY: ${job.company}
-JOB DESCRIPTION:
-${job.description}
+JOBS TO SCORE (${jobs.length} total):
+${jobsList}
 
-Score how well this candidate matches this job from 0-100.`;
+Return a JSON array with exactly ${jobs.length} entries, one per job, in the same order, each with the job's exact "id".`;
 
-  const raw = await callLLM(system, userText, 500);
-  return extractJson(raw);
+  // Generous token budget: ~60-90 tokens per job entry, scaled to batch size.
+  const maxTokens = Math.min(8192, 500 + jobs.length * 120);
+
+  const raw = await callLLM(system, userText, maxTokens);
+  const results = extractJson(raw);
+
+  const map = new Map();
+  for (const r of results) {
+    if (r && r.id) map.set(String(r.id), r);
+  }
+  return map;
 }
 
 export async function tailorResume(job, baseResume) {
@@ -91,8 +123,6 @@ ${job.description}`;
   const raw = await callLLM(system, userText, 1500);
   const result = extractJson(raw);
 
-  // Defensive validation — fall back to original order if the model returned
-  // something malformed, rather than crashing or silently dropping content.
   for (const { title, bulletCount } of sectionTitles) {
     const order = result.sectionBulletOrder?.[title];
     const isValidPermutation =
