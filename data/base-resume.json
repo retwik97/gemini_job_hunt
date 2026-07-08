@@ -1,29 +1,109 @@
 {
-  "name": "Retwik Satya Teja",
-  "contactLine": "Systems Engineer / .NET Developer | linkedin.com/in/retwik-satya-teja-9040ab147 | Hyderabad, India",
-  "summary": "Systems Engineer / .NET Developer with 4 years of experience operating Microsoft 365-scale Azure infrastructure. Skilled in Azure VMSS, Azure DevOps CI/CD, AKS/Docker, Bicep/ARM IaC, KQL-based observability, and .NET Framework development. AZ-400, AZ-204, AZ-900 certified.",
-  "skills": [
-    "Azure VMSS",
-    "Azure DevOps (CI/CD Pipelines)",
-    "AKS",
-    "Docker",
-    "Bicep",
-    "ARM Templates",
-    "KQL / Log Analytics",
-    ".NET Framework",
-    "C#",
-    "PowerShell",
-    "Python",
-    "Bash",
-    "Azure Front Door",
-    "Azure SQL / Entra ID Authentication",
-    "Site Reliability Engineering"
+  "name": "RETWIK INAVELLI",
+  "headline": "Azure DevOps Engineer | Site Reliability Engineer | Docker & Kubernetes (AKS) | .NET",
+  "location": "Hyderabad, Telangana, India",
+  "phone": "+91 8500232880",
+  "email": "retwikinavelli@gmail.com",
+  "linkedin": "LinkedIn",
+  "summary": "Azure DevOps Engineer and Site Reliability Engineer with 4 years of experience supporting Microsoft 365-scale production infrastructure across 13 global Azure regions. Skilled in CI/CD pipeline engineering, Docker containerization, Kubernetes (AKS) orchestration, Bicep/ARM IaC, and KQL-based observability — with a track record of resolving high-severity incidents, reducing MTTD, and improving deployment reliability. Experienced in ASP.NET Core development with a strong foundation in cloud-native patterns and production operations.",
+  "skillCategories": [
+    {
+      "category": "Cloud & Infrastructure",
+      "skills": ["Microsoft Azure", "Azure Kubernetes Service (AKS)", "Azure Container Registry (ACR)", "Azure Virtual Machine Scale Sets (VMSS)", "Azure Front Door", "Azure Key Vault", "Managed Identities", "RBAC", "Azure Logic Apps", "Azure App Service"]
+    },
+    {
+      "category": "DevOps & CI/CD",
+      "skills": ["Azure DevOps", "Azure Pipelines (YAML & Classic)", "Azure Repos", "Azure Artifacts", "Azure Boards", "Git"]
+    },
+    {
+      "category": "Containers & Orchestration",
+      "skills": ["Docker", "Dockerfile Authoring", "Multi-Stage Builds", "Layer Caching", "Alpine Linux", "Kubernetes (K8s)", "Deployments"]
+    },
+    {
+      "category": "IaC & Automation",
+      "skills": ["Azure Bicep", "ARM Templates", "Infrastructure as Code (IaC)"]
+    },
+    {
+      "category": "Monitoring & Observability",
+      "skills": ["Azure Monitor", "Log Analytics (KQL)", "Application Insights", "Incident Management (IcM)"]
+    },
+    {
+      "category": "Scripting & Development",
+      "skills": ["C#", "ASP.NET Core", ".NET Framework", "REST APIs", "PowerShell", "Python", "Bash", "SQL Server", "LINQ"]
+    }
   ],
-  "experienceHighlights": [
-    "Diagnosed a production incident on a 75-instance Azure VMSS where Azure Front Door was reusing persistent connections to only 4 instances, causing IIS saturation and 503 errors despite healthy probe status; used KQL/Log Analytics to isolate root cause and drove post-incident action items including per-instance alerting.",
-    "Resolved persistent NuGet/MSBuild build failures in a .NET Framework 4.7.2 solution caused by TFM incompatibilities, incorrect Azure DevOps pipeline tooling, and stale HintPaths, restoring reliable CI builds.",
-    "Configured Azure SQL Server Entra ID-only authentication across Portal, CLI, PowerShell, and Bicep for improved security posture.",
-    "Operate and support Microsoft 365-scale Azure infrastructure spanning VMSS, AKS/Docker, and Azure DevOps CI/CD pipelines.",
-    "Certified in AZ-400 (DevOps Engineer Expert), AZ-204 (Developer Associate), and AZ-900 (Azure Fundamentals)."
+  "certifications": [
+    "Microsoft Certified: Azure DevOps Engineer Expert AZ-400",
+    "Microsoft Certified: Azure Developer Associate AZ-204",
+    "Microsoft Certified: Azure Fundamentals AZ-900"
+  ],
+  "experience": [
+    {
+      "company": "Tata Consultancy Services (TCS)",
+      "location": "Hyderabad, Telangana, India",
+      "role": "Systems Engineer – Azure DevOps & Site Reliability Engineering",
+      "dates": "July 2022 – Present (4 Years)",
+      "sections": [
+        {
+          "title": "Site Reliability Engineering – Microsoft 365 Production Operations",
+          "bullets": [
+            "Sustained 99.9%+ availability for Microsoft 365 business-critical services as On-Call SRE across 13 global Azure regions, covering 75+ VMSS instances per region.",
+            "Diagnosed and resolved a high-severity Azure Front Door connection reuse incident — AFD persistent connections routed to only 4 of 75 VMSS instances, causing IIS thread pool saturation and cascading 503 errors while LB health probes reported all instances healthy; restored service by configuring per-instance Azure Monitor metric alerts.",
+            "Reduced mean time to detect (MTTD) by 40%+ through KQL-based Log Analytics queries and targeted Azure Monitor alert rules, replacing broad platform-level alerts with per-instance CPU and availability thresholds.",
+            "Executed structured incident response across 50+ production incidents, authoring RCA reports and driving post-incident action items through IcM workflows to prevent recurrence.",
+            "Uncovered and remediated 2 critical monitoring gaps — per-instance CPU alerting absent for 75-node VMSS fleet and IIS log collection disabled — improving observability coverage across the production fleet.",
+            "Reviewed and validated Azure Logic Apps automation workflows supporting operational runbooks, reducing manual intervention for recurring incident patterns."
+          ]
+        },
+        {
+          "title": "Container Engineering & Cloud Platform – Docker, Kubernetes, AKS",
+          "bullets": [
+            "Engineered optimized Dockerfiles for .NET applications using multi-stage build patterns and Alpine Linux base images, cutting final image size by ~60% versus full .NET SDK base images and reducing container startup time.",
+            "Applied Docker layer caching strategy — ordering COPY and RUN instructions to separate dependency restore from source compilation, eliminating unnecessary NuGet package restores on code-only changes and reducing pipeline build time by ~35%.",
+            "Configured Azure DevOps YAML pipelines to build, tag, and push Docker images to Azure Container Registry (ACR), enabling versioned artifact management across dev, staging, and production environments.",
+            "Crafted Kubernetes YAML manifests covering Deployments, ClusterIP/LoadBalancer Services, ConfigMaps, and Secrets for stateless workload deployment and secure configuration management.",
+            "Deployed containerized workloads to Azure Kubernetes Service (AKS), performing rolling update validation, horizontal pod scaling, and live troubleshooting via kubectl logs and kubectl describe.",
+            "Enforced zero-trust security posture by configuring Azure Key Vault, Managed Identities, and RBAC role assignments across AKS, ACR, and VMSS workloads."
+          ]
+        },
+        {
+          "title": "CI/CD Pipeline Engineering – Azure DevOps",
+          "bullets": [
+            "Designed and maintained Azure DevOps YAML CI/CD pipelines supporting build, test, containerization, and multi-environment deployment for 3+ production services.",
+            "Streamlined Salesforce deployment automation pipelines — executing pre- and post-deployment validations and troubleshooting release failures, contributing to a 20% reduction in deployment rollback frequency.",
+            "Partnered with development and QA teams on release readiness reviews, deployment window scheduling, and rollback strategy definition, ensuring zero unplanned outages during release windows."
+          ]
+        },
+        {
+          "title": ".NET Backend Development",
+          "bullets": [
+            "Delivered 10+ bug fixes and feature enhancements across ASP.NET Core REST APIs, improving backend reliability and response consistency for enterprise-facing services.",
+            "Configured feature flag management using Azure App Configuration and Microsoft.FeatureManagement SDK within ASP.NET Core middleware pipelines, enabling safe progressive feature rollouts without redeployment."
+          ]
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "Containerized .NET Application – End-to-End Docker & AKS Deployment",
+      "bullets": [
+        "Authored an optimized multi-stage Dockerfile using Alpine Linux base image, achieving significant image size reduction; structured COPY/RUN instruction order to eliminate redundant NuGet package restores on source-only changes.",
+        "Built an Azure DevOps pipeline to tag and push images to ACR, then deployed workloads to AKS using Kubernetes Deployment + LoadBalancer Service manifests with kubectl-based rollout verification."
+      ]
+    },
+    {
+      "title": "Travel Desk Application – Full Stack ASP.NET MVC",
+      "bullets": [
+        "Developed a full-stack travel management system using ASP.NET MVC, C#, Razor Views, and SQL Server; built end-to-end booking workflows, CRUD operations, and relational schema design independently."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Technology – Electronics & Communication Engineering",
+      "years": "2018 – 2022",
+      "school": "Pragati Engineering College, Kakinada | JNTUK University"
+    }
   ]
 }
